@@ -27,7 +27,7 @@ class TranslationApp:
     def __init__(self) -> None:
         self._app = QApplication(sys.argv)
         self._app.setApplicationName("桌面翻译工具")
-        self._app.setQuitOnLastWindowClosed(False)
+        self._app.setQuitOnLastWindowClosed(True)
 
         self._data_dir = Path.home() / ".translation_tool"
         self._data_dir.mkdir(parents=True, exist_ok=True)
