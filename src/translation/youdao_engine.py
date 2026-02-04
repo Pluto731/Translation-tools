@@ -19,9 +19,10 @@ from src.utils.text_utils import is_single_word
 
 class YoudaoEngine(TranslationEngine):
 
-    def __init__(self, app_key: str, app_secret: str) -> None:
+    def __init__(self, app_key: str, app_secret: str, api_url: str = YOUDAO_API_URL) -> None:
         self._app_key = app_key
         self._app_secret = app_secret
+        self._api_url = api_url
         self._client = httpx.Client(timeout=10.0)
 
     @property
@@ -68,7 +69,7 @@ class YoudaoEngine(TranslationEngine):
         }
 
         try:
-            response = self._client.post(YOUDAO_API_URL, data=data)
+            response = self._client.post(self._api_url, data=data)
             response.raise_for_status()
             result_data = response.json()
         except httpx.HTTPError as exc:
@@ -133,7 +134,7 @@ class YoudaoEngine(TranslationEngine):
         }
 
         try:
-            response = self._client.post(YOUDAO_API_URL, data=data)
+            response = self._client.post(self._api_url, data=data)
             response.raise_for_status()
             result_data = response.json()
         except httpx.HTTPError as exc:

@@ -6,12 +6,22 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from src.config.constants import BAIDU_API_URL, YOUDAO_API_URL
+from src.utils.crypto import SimpleCrypto
+
+_SECRET_FIELDS = ("baidu_secret_key", "youdao_app_secret", "llm_api_key")
+
 
 class ApiKeys(BaseModel, frozen=True):
     baidu_app_id: str = ""
     baidu_secret_key: str = ""
+    baidu_api_url: str = BAIDU_API_URL
     youdao_app_key: str = ""
     youdao_app_secret: str = ""
+    youdao_api_url: str = YOUDAO_API_URL
+    llm_api_url: str = ""
+    llm_api_key: str = ""
+    llm_model_name: str = ""
 
 
 class Preferences(BaseModel, frozen=True):
@@ -34,6 +44,12 @@ class AppSettings(BaseModel, frozen=True):
         if path.exists():
             try:
                 data = json.loads(path.read_text(encoding="utf-8"))
+                api_keys_data = data.get("api_keys", {})
+                for field in _SECRET_FIELDS:
+                    raw = api_keys_data.get(field, "")
+                    if raw:
+                        api_keys_data[field] = SimpleCrypto.decrypt(raw)
+                data["api_keys"] = api_keys_data
                 return AppSettings(**data)
             except (json.JSONDecodeError, ValueError):
                 return AppSettings()
@@ -41,8 +57,13 @@ class AppSettings(BaseModel, frozen=True):
 
     def save(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
+        data = self.model_dump()
+        for field in _SECRET_FIELDS:
+            raw = data["api_keys"].get(field, "")
+            if raw:
+                data["api_keys"][field] = SimpleCrypto.encrypt(raw)
         path.write_text(
-            json.dumps(self.model_dump(), indent=2, ensure_ascii=False),
+            json.dumps(data, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 

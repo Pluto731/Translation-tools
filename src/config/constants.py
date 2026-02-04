@@ -48,6 +48,20 @@ YOUDAO_LANGUAGE_CODES = {
     "auto": "auto",
 }
 
+LLM_LANGUAGE_NAMES = {
+    "zh": "Chinese",
+    "en": "English",
+    "jp": "Japanese",
+    "kor": "Korean",
+    "fra": "French",
+    "de": "German",
+    "ru": "Russian",
+    "spa": "Spanish",
+    "pt": "Portuguese",
+    "it": "Italian",
+    "auto": "auto-detect",
+}
+
 SUPPORTED_FILE_EXTENSIONS = {".txt", ".docx", ".pdf"}
 
 MAX_TEXT_CHUNK_SIZE = 5000

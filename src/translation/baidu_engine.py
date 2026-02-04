@@ -18,9 +18,10 @@ from src.utils.text_utils import is_single_word
 
 class BaiduEngine(TranslationEngine):
 
-    def __init__(self, app_id: str, secret_key: str) -> None:
+    def __init__(self, app_id: str, secret_key: str, api_url: str = BAIDU_API_URL) -> None:
         self._app_id = app_id
         self._secret_key = secret_key
+        self._api_url = api_url
         self._client = httpx.Client(timeout=10.0)
 
     @property
@@ -58,7 +59,7 @@ class BaiduEngine(TranslationEngine):
         }
 
         try:
-            response = self._client.get(BAIDU_API_URL, params=params)
+            response = self._client.get(self._api_url, params=params)
             response.raise_for_status()
             data = response.json()
         except httpx.HTTPError as exc:
