@@ -42,6 +42,15 @@ class EngineManager:
     def lookup_word(self, word: str, from_lang: str, to_lang: str) -> TranslationResult:
         return self.current_engine.lookup_word(word, from_lang, to_lang)
 
+    def reload_engines(self, engines: list[TranslationEngine], default_name: str = "") -> None:
+        self.close_all()
+        self._engines = {}
+        self._current_engine_name = None
+        for engine in engines:
+            self.register_engine(engine)
+        if default_name and default_name in self._engines:
+            self._current_engine_name = default_name
+
     def close_all(self) -> None:
         for engine in self._engines.values():
             if hasattr(engine, "close"):

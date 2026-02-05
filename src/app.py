@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+import ctypes
 import sys
 from pathlib import Path
+
+if sys.platform == "win32":
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+        "translation_tool.desktop.1.0"
+    )
 
 from PyQt5.QtCore import QThreadPool
 from PyQt5.QtWidgets import QApplication
@@ -9,7 +15,7 @@ from PyQt5.QtWidgets import QApplication
 from src.clipboard.hotkey_manager import HotkeyManager
 from src.clipboard.selection_handler import SelectionHandler
 from src.config.constants import DB_NAME, SETTINGS_FILE
-from src.config.settings import get_settings, init_settings
+from src.config.settings import get_settings, init_settings, update_settings
 from src.database.connection import init_database
 from src.database.migrations import create_tables
 from src.history.repository import TranslationRepository
@@ -18,6 +24,7 @@ from src.translation.engine_factory import EngineFactory
 from src.translation.engine_manager import EngineManager
 from src.ui.floating_popup import FloatingPopup
 from src.ui.main_window import MainWindow
+from src.ui.styles.theme import create_app_icon
 from src.ui.system_tray import SystemTray
 from src.utils.async_worker import AsyncWorker
 
@@ -27,6 +34,7 @@ class TranslationApp:
     def __init__(self) -> None:
         self._app = QApplication(sys.argv)
         self._app.setApplicationName("桌面翻译工具")
+        self._app.setWindowIcon(create_app_icon())
         self._app.setQuitOnLastWindowClosed(True)
 
         self._data_dir = Path.home() / ".translation_tool"
@@ -92,8 +100,20 @@ class TranslationApp:
             self._on_text_selected
         )
 
+        self._main_window.settings_changed.connect(
+            self._on_settings_changed
+        )
+
         self._translation_service.translation_completed.connect(
             self._floating_popup.show_translation
+        )
+
+    def _on_settings_changed(self) -> None:
+        self._settings = get_settings()
+        new_engines = EngineFactory.create_all_engines(self._settings.api_keys)
+        self._engine_manager.reload_engines(
+            new_engines,
+            self._settings.preferences.default_engine,
         )
 
     def _on_translation_completed(self, result) -> None:

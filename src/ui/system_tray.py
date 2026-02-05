@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from PyQt5.QtWidgets import QAction, QMenu, QSystemTrayIcon
 
+from src.ui.styles.theme import create_app_icon
+
 
 class SystemTray(QSystemTrayIcon):
 
@@ -10,6 +12,7 @@ class SystemTray(QSystemTrayIcon):
 
         self._main_window = main_window
 
+        self.setIcon(create_app_icon())
         self.setToolTip("桌面翻译工具")
 
         self._create_menu()

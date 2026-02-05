@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (
     QAction,
     QMainWindow,
@@ -19,6 +20,7 @@ from src.ui.widgets.translation_panel import TranslationPanel
 
 
 class MainWindow(QMainWindow):
+    settings_changed = pyqtSignal()
 
     def __init__(
         self,
@@ -83,7 +85,8 @@ class MainWindow(QMainWindow):
 
     def _open_settings(self) -> None:
         dialog = SettingsDialog(self)
-        dialog.exec_()
+        if dialog.exec_() == SettingsDialog.Accepted:
+            self.settings_changed.emit()
 
     def _show_about(self) -> None:
         from PyQt5.QtWidgets import QMessageBox

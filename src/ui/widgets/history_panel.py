@@ -67,6 +67,7 @@ class HistoryPanel(QWidget):
 
         self._table.setSelectionBehavior(QTableWidget.SelectRows)
         self._table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self._table.doubleClicked.connect(self._on_double_click)
 
         layout.addWidget(self._table)
 
@@ -126,10 +127,14 @@ class HistoryPanel(QWidget):
         for row, record in enumerate(records):
             self._table.setItem(row, 0, QTableWidgetItem(str(record.id)))
 
-            source_item = QTableWidgetItem(record.source_text[:50] + "..." if len(record.source_text) > 50 else record.source_text)
+            source_display = record.source_text[:50] + "..." if len(record.source_text) > 50 else record.source_text
+            source_item = QTableWidgetItem(source_display)
+            source_item.setToolTip(record.source_text)
             self._table.setItem(row, 1, source_item)
 
-            translated_item = QTableWidgetItem(record.translated_text[:50] + "..." if len(record.translated_text) > 50 else record.translated_text)
+            translated_display = record.translated_text[:50] + "..." if len(record.translated_text) > 50 else record.translated_text
+            translated_item = QTableWidgetItem(translated_display)
+            translated_item.setToolTip(record.translated_text)
             self._table.setItem(row, 2, translated_item)
 
             lang_item = QTableWidgetItem(f"{record.from_lang} → {record.to_lang}")
@@ -210,6 +215,21 @@ class HistoryPanel(QWidget):
                 QMessageBox.information(self, "成功", f"已导出 {len(records)} 条记录")
             except Exception as e:
                 QMessageBox.critical(self, "错误", f"导出失败: {str(e)}")
+
+    def _on_double_click(self, index) -> None:
+        row = index.row()
+        record_id = int(self._table.item(row, 0).text())
+        record = self._repository.find_by_id(record_id)
+        if record:
+            QMessageBox.information(
+                self,
+                "翻译详情",
+                f"原文:\n{record.source_text}\n\n"
+                f"译文:\n{record.translated_text}\n\n"
+                f"语言: {record.from_lang} → {record.to_lang}\n"
+                f"引擎: {record.engine_name}\n"
+                f"时间: {record.created_at.strftime('%Y-%m-%d %H:%M:%S')}",
+            )
 
     def _on_delete_selected(self) -> None:
         selected_rows = self._table.selectionModel().selectedRows()

@@ -185,7 +185,7 @@ class SettingsDialog(QDialog):
             QMessageBox.information(
                 self,
                 "成功",
-                "设置已保存。部分设置需要重启应用才能生效。",
+                "设置已保存。修改快捷键需要重启应用生效。",
             )
 
             self.accept()

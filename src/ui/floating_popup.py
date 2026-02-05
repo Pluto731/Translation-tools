@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import (
     QHBoxLayout,
@@ -30,6 +30,10 @@ class FloatingPopup(QWidget):
         self.setAttribute(Qt.WA_ShowWithoutActivating, True)
 
         self.setStyleSheet(FLOATING_POPUP_STYLE)
+
+        self._auto_hide_timer = QTimer(self)
+        self._auto_hide_timer.setSingleShot(True)
+        self._auto_hide_timer.timeout.connect(self.hide)
 
         self._init_ui()
 
@@ -89,3 +93,5 @@ class FloatingPopup(QWidget):
 
         self.show()
         self.raise_()
+
+        self._auto_hide_timer.start(5000)

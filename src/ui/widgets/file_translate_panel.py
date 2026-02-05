@@ -124,6 +124,9 @@ class FileTranslatePanel(QWidget):
             from_lang,
             to_lang,
         )
+        worker.signals.error.connect(
+            lambda exc: self._on_error_occurred(str(exc))
+        )
 
         self._thread_pool.start(worker)
 

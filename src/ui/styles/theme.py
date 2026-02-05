@@ -121,3 +121,17 @@ QPushButton:hover {
     background-color: #1565c0;
 }
 """
+
+
+def create_app_icon():
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtGui import QColor, QFont, QIcon, QPainter, QPixmap
+
+    pixmap = QPixmap(32, 32)
+    pixmap.fill(QColor("#1976d2"))
+    painter = QPainter(pixmap)
+    painter.setPen(QColor("white"))
+    painter.setFont(QFont("Microsoft YaHei", 18, QFont.Bold))
+    painter.drawText(pixmap.rect(), Qt.AlignCenter, "译")
+    painter.end()
+    return QIcon(pixmap)
